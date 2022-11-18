@@ -11,3 +11,5 @@ Frontend da minha aplicação web, um site de anotações integrado ao um banco 
 ## Necessário instalar o Node.js e React.js em sua máquina
 
 ## Ainda sob desenvolvimento e correção de bugs
+
+<a href="https://github.com/vinicamargors/notepad-backend"> Acesse o backend da minha aplicação </a>

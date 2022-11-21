@@ -1,5 +1,6 @@
 # notepad-frontend
-Frontend da minha aplicação web, um site de anotações integrado ao um banco de dados não-relacional.
+Frontend da minha aplicação web, um site de anotações integrado ao um banco de dados não-relacional. <br>
+### Trata-se de um estudo de JavaScript Fullstack, por isso o arquivo está comentado. <br>
 
 ## Tecnologias utilizadas:
 - React.js

@@ -1,17 +1,17 @@
 import React from 'react';
 
-function Notes(){
+function Notes({data}){ //buscando nosso data do app.js
     return (
         <>
             <li id="1" className="notepad-infos">
               <div>
-              <strong>Fazer Compras</strong>
+              <strong>{data.title/*vai buscar o registro title do nosso db*/}</strong>
                 <div>
                   x
                 </div>
-              </div>
+              </div> 
 
-              <textarea defaultValue={"Lorem Ipsum is simply dummy text of the printing and typesetting industry."}></textarea>
+              <textarea defaultValue={data.notes/*vai buscar o registro notes do nosso db*/}></textarea> 
               <span>!</span>
             </li>
         </>

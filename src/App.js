@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';//useEffect, faz a função ser rodada somente uma vez a cada construção do aplicativo
+import React, {useState, useEffect} from 'react';
 
 import api from './services/api.js'
 
@@ -17,14 +17,16 @@ function App(){
 
   const [title, setTitles] = useState('');
   const [notes, setNotes] = useState('');
-  const [allNotes, setAllNotes] = useState('');
+  const [allNotes, setAllNotes] = useState([]);//inicia ele como um array, pq ele é um array de informações 
 
-  useEffect(() =>{
+  useEffect(() =>{//useEffect, faz a função ser rodada somente uma vez a cada construção do aplicativo
     async function getAllNotes(){
       
-      const response = await api.get('/annotations',);
+      const response = await api.get('/annotations',);//rota das anotações
 
+      setAllNotes(response.data);//onde vai estar armazenado todas as minhas informações do title e do notes 
     }
+    getAllNotes()//vai estar executando nossa função
   },[]);
 
   async function handleSubmit(e){//função assincrona para não interferir no resto do nosso código
@@ -33,12 +35,27 @@ function App(){
     const response = await api.post('/annotations',{//função post pq ele vai criar esse registro
       title, 
       notes,
-      priority: false
+      priority: false //vai vir padrão como falso
     } ) 
 
-    setTitles('')
+    setTitles('')//limpar os inputs depois da inserção, toda vez que enviar, vai limpar
     setNotes('')
+
+    setAllNotes([...allNotes.response.data])//setar de forma automatica nossa listagem de notas, sem precisar dar f5 na pag
+    //vai atualizar nosso allNotes com o proprio data dele
   }
+
+  useEffect(() => {//estrutura do useEffect recebe função do primeiro paramentro, seguido de um array de dependencias
+    function enableSubmitButton(){ //essa vai função vai habilitar o destaque (hover) do botão quando estiver disponivel para salvar o registro
+    let /*let pq vai ser uma variavel manipulavel*/ btnSave = document.getElementById('btn_submit')
+    btnSave.style.background = '#D8A2F8' 
+    if(title && notes){
+      btnSave.style.background = '#a453d3'
+    }
+  }
+  enableSubmitButton()
+  },[title,notes]) //a dependencia dela, que depende do meu title e notes estarem inseridos de uma info
+
 
   return(
     <div id="app">
@@ -64,19 +81,21 @@ function App(){
               />
             </div>
 
-            <button type="submit">Salvar</button>
+            <button id="btn_submit" type="submit">Salvar</button>
 
           </form>
         </aside>
         <main>
           <ul>
+            {allNotes.map(data => (//maps percorre todo meu allNotes, no meu data do allNotes
+              <Notes data={data}/>//passando o data para nosso componente poder usar
+            ))}
             
-            <Notes/>
           </ul>
         </main>
     </div>
   )
-  ;//tag vazia para identar melhor o codigo
+
 }
 
 export default App;//tá exportando essa função para ser usada em outro arquivo de código

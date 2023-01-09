@@ -11,23 +11,63 @@ import './sidebar.css'
 //propriedades -> são informações que um componente pai, passa para um componente filho
 //estado -> Função que armazena uma informação e manipula ela, preciso declarar {use}
 
-import Notes from './components/notes.js'
+import Notes from './components/notes/notes.js'
 
 function App(){
 
+  const [selectedValue, setSelectedValue] = useState('all');
   const [title, setTitles] = useState('');
   const [notes, setNotes] = useState('');
   const [allNotes, setAllNotes] = useState([]);//inicia ele como um array, pq ele é um array de informações 
 
   useEffect(() =>{//useEffect, faz a função ser rodada somente uma vez a cada construção do aplicativo
-    async function getAllNotes(){
-      
-      const response = await api.get('/annotations',);//rota das anotações
-
-      setAllNotes(response.data);//onde vai estar armazenado todas as minhas informações do title e do notes 
-    }
+    
     getAllNotes()//vai estar executando nossa função
   },[]);
+
+  async function getAllNotes(){
+      
+    const response = await api.get('/annotations',);//rota das anotações
+
+    setAllNotes(response.data);//onde vai estar armazenado todas as minhas informações do title e do notes 
+  }
+
+  async function loadNotes(option){
+    const params = { priority: option }; //quero que ele me retorne só quem é true ou só quem é false
+    const response = await api.get('/priorities', { params });
+
+    if (response){
+      setAllNotes(response.data);
+    }
+  }
+
+  function handleSwitchPriority(e){
+    setSelectedValue(e.value);
+
+    if(e.checked && e.value != 'all'){
+      loadNotes(e.value);
+    }else{
+      getAllNotes(); 
+    }
+  }
+
+  async function handleDelete(id){
+    const deletedNote = await api.delete(`/annotations/${id}`)
+
+    if(deletedNote){
+      setAllNotes(allNotes.filter(notes => notes._id != id)); // vai percorrer as anotações, se for diferente da que eu quero deletar, vai manter
+    }
+  };
+
+  async function handleChangePriority(id){
+     const note = await api.post(`/priorities/${id}`);
+
+     if(note){
+      getAllNotes();
+       
+     }
+  }
+
 
   async function handleSubmit(e){//função assincrona para não interferir no resto do nosso código
     e.preventDefault();//para ele não fazer o evento padrão de enviar o form submit para outra pagina
@@ -41,7 +81,7 @@ function App(){
     setTitles('')//limpar os inputs depois da inserção, toda vez que enviar, vai limpar
     setNotes('')
 
-    setAllNotes([...allNotes.response.data])//setar de forma automatica nossa listagem de notas, sem precisar dar f5 na pag
+    setAllNotes([...allNotes, response.data])//setar de forma automatica nossa listagem de notas, sem precisar dar f5 na pag
     //vai atualizar nosso allNotes com o proprio data dele
   }
 
@@ -67,6 +107,7 @@ function App(){
               <label htmlFor="title">Titulo da anotação</label>
               <input
                 required
+                maxLength={64}
                 value={title}//define valor do input como title do useState
                 onChange={e => setTitles(e.target.value)}//para prevenir evento, falando que oq vai manipular nosso title é o setTitles
               />
@@ -84,11 +125,17 @@ function App(){
             <button id="btn_submit" type="submit">Salvar</button>
 
           </form>
+            
         </aside>
         <main>
           <ul>
             {allNotes.map(data => (//maps percorre todo meu allNotes, no meu data do allNotes
-              <Notes data={data}/>//passando o data para nosso componente poder usar
+              <Notes 
+              key={data._id}
+              data={data}
+              handleDelete={handleDelete}
+              handleChangePriority={handleChangePriority}
+              />//passando o data para nosso componente poder usar
             ))}
             
           </ul>
